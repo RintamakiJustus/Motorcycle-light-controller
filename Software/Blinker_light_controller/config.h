@@ -19,6 +19,7 @@
 #include "Ws2812.h"
 
 #define blinktime 400 // MS
+#define calfactor 1.09; //Calibration factor for voltage measurement
 
 #define front_light_led_num 20  // number of leds in strip
 #define left_start_idx 0		// Left side index's

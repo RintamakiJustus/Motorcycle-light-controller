@@ -46,13 +46,23 @@ void setup_control()
 		PORTB.DIRSET = PB2;		// PCB led and axillary pin to output (Switch map)
 		PORTB.OUTSET = PB2;	    // PULL HIGH
 		//////////////////////////////////////////////////////////////////////////
+		
 		// Thermistor voltage measurement setup
 		PORTA.DIRCLR = thermistorpin; // Thermistor pin to input
 		PORTA.PIN7CTRL = PORT_ISC_INPUT_DISABLE_gc; //  Disable digital buffer
+		// Input voltage measurenment:
+		VREF.CTRLA = VREF_ADC0REFSEL_4V34_gc;
+		_delay_ms(1);
+		ADC0.CTRLA = 0; // ADC off
 		
-		ADC0.CTRLA = ADC_RESSEL_10BIT_gc; // set 10 bit resolution
-		ADC0.CTRLC |= ADC_SAMPCAP_bm | ADC_REFSEL1_bm ; // Enable sample capacitor and select VDD reference
-		ADC0.CTRLA |= ADC_ENABLE_bm; // AND enable ADC
+		ADC0.MUXPOS = ADC_MUXPOS_AIN10_gc; // Select input AIN 10 for ADC0 (PB1)
+		
+		PORTB.DIRCLR = voltage_pin; // pin to input:
+		PORTB.PIN1CTRL = PORT_ISC_INPUT_DISABLE_gc; // Disable digital buffer
+		ADC0.SAMPCTRL = 10;
+		ADC0.CTRLC = ADC_REFSEL_INTREF_gc | ADC_PRESC_DIV32_gc | ADC_SAMPCAP_bm; ; //select VREF Reference
+		ADC0.CTRLA = ADC_RESSEL_10BIT_gc // set 10 bit resolution
+				| (ADC_ENABLE_bm ) ; // AND enable ADC
 		
 		//////////////////////////////////////////////////////////////////////////
 		// Led bar PWM counter setup TCA0
@@ -103,17 +113,17 @@ void read_voltage(void){
 	float_t voltage = 0;
 	float_t avg = 0;
 	
-	ADC0.MUXPOS = 0x0B; // Select input AIN 11 for ADC0
-	
+	ADC0.MUXPOS = ADC_MUXPOS_AIN10_gc; // Select input AIN 10 for ADC0 (PB1)
+	_delay_ms(1);
 	for (uint8_t i = 0; i<10 ; i++) {
 		ADC0.COMMAND = ADC_STCONV_bm; // Start conversion
 		while (!(ADC0.INTFLAGS & ADC_RESRDY_bm)); // Wait for value
-		ADC0.INTFLAGS |= ADC_RESRDY_bm; // Clear ready flag
-		adc_sum += ADC0.RES;
+		adc_sum = adc_sum + ADC0.RES;
+		ADC0.INTFLAGS = ADC_RESRDY_bm; // Clear ready flag
 	}
 	avg = adc_sum / 10.0f;
-	voltage = (avg/1023)*5*4.3;
-	battery_voltage = (int)voltage;
+	voltage = (avg/1023)*4.34*4.3*calfactor;
+	battery_voltage = (uint8_t)(voltage + 0.5);
 }
 
 void read_temperature (void){

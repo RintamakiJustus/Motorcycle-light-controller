@@ -44,7 +44,7 @@ void update_buttons(void){
 		
 		uint16_t start = millis();
 		while (!(PORTA.IN & middle_button)){    // Wait for Button press to stop
-			if (millis() - start > 1000)		// Stop waiting if time over 2s
+			if (millis() - start > 700)		// Stop waiting if time over 0.7s
 			{
 				break;
 			}

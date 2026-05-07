@@ -34,7 +34,7 @@ uint8_t highbeam = 0; // 0 = daytime, 1 = night/dark,
 int8_t PWM_pros = 0; // % Off duty cycle on for ledbar
 uint8_t light_value = 100; // White light brightness 0 - 255
 
-uint8_t battery_voltage = 0; // Voltage in int, ex. 12.5 --> 12
+uint8_t battery_voltage = 0; // Voltage in int, ex. 12.5 --> 13
 
 float_t engine_temperature = 0;
 
@@ -136,13 +136,15 @@ void update_mode(){
 
 void blink_code(uint8_t num){
 	PORTB.OUTCLR = PB2;
+	wait_ms(500);
 	set_ledbar(0);
 	for (uint8_t i = 0; i<num;i++ )
 	{
-		PORTB.OUTCLR = PB2;
+		PORTB.OUTTGL = PB2;
 		wait_ms(500);
-		PORTB.OUTSET = PB2;
+		PORTB.OUTTGL = PB2;
 		wait_ms(500);
+		
 	}
 }
 	
