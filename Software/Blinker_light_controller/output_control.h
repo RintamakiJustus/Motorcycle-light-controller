@@ -19,6 +19,8 @@ extern uint8_t battery_voltage ; // Voltage in int, ex. 12.5 --> 12
 
 extern float_t engine_temperature ;
 
+uint8_t SHIFT_REG ; // external 8 bit shift register buffer to be updated
+
 extern uint8_t currentmode ;
 void blinker(uint8_t side);
 void setup_control(void);
@@ -30,4 +32,7 @@ void update_highbeam(void);
 uint16_t millis(void);
 void wait_ms(uint16_t ms);
 void rgb_effect(void);
+void update_sft_reg(void);
+void rear_blinker(uint8_t, bool);
+void rear_drive(uint8_t);
 #endif

@@ -12,6 +12,7 @@
 uint8_t Red = 100;
 uint8_t Green = 255;
 uint8_t Blue = 30;
+uint8_t SHIFT_REG = 0x00;
 
 void wait_ms(uint16_t ms){
 	uint16_t oldtime = millis();
@@ -43,8 +44,10 @@ void setup_control()
 		PORTA.PIN4CTRL = PORT_PULLUPEN_bm;
 		PORTA.PIN5CTRL = PORT_PULLUPEN_bm; // Pull up resistors to switches (sw1 & sw2)
 		
-		PORTB.DIRSET = PB2;		// PCB led and axillary pin to output (Switch map)
-		PORTB.OUTSET = PB2;	    // PULL HIGH
+		PORTB.DIRSET = sft_DATA;		// PCB led and axillary pin to output (Switch map)
+		PORTB.OUTSET = sft_DATA;	    // PULL HIGH
+		PORTB.DIRSET = sft_CLK;
+		PORTB.OUTCLR = sft_CLK;
 		//////////////////////////////////////////////////////////////////////////
 		
 		// Thermistor voltage measurement setup
@@ -74,7 +77,7 @@ void setup_control()
 		
 		TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV16_gc; // Prescaler 16x
 		TCA0.SINGLE.CTRLA |= TCA_SINGLE_ENABLE_bm; // Start counter
-		PORTB.OUTSET = PB2; // Limitermap ON
+		PORTB.OUTSET = sft_DATA; // Limitermap ON
 		
 		//////////////////////////////////////////////////////////////////////////
 		// Set real time counter to count milliseconds, for millis() -function
@@ -179,11 +182,15 @@ void blinker(uint8_t side){
 		fill_color(led_strip,left_start_idx,left_end_idx,255,165,0); // Blinker side to orange
 		fill_color(led_strip,right_start_idx,right_end_idx,light_value,light_value,light_value); // other side to White
 		update_strip(led_strip);
+		rear_blinker(Left,true);
+		update_sft_reg();
 		
 		wait_ms(blinktime);
 		
 		fill_color(led_strip,0, front_light_led_num, light_value,light_value,light_value); // All white
 		update_strip(led_strip);
+		rear_blinker(Left,false);
+		update_sft_reg();
 		
 		wait_ms(blinktime);
 		
@@ -192,10 +199,15 @@ void blinker(uint8_t side){
 		fill_color(led_strip,right_start_idx,right_end_idx,255,165,0); // Blinker side to orange
 		fill_color(led_strip,left_start_idx,left_end_idx,light_value,light_value,light_value); // other side to White
 		update_strip(led_strip);
+		rear_blinker(Right,true);
+		update_sft_reg();
 		
 		wait_ms(blinktime);
+		
 		fill_color(led_strip,0, front_light_led_num, light_value,light_value,light_value); // All white
 		update_strip(led_strip);
+		rear_blinker(Right,false);
+		update_sft_reg();
 		
 		wait_ms(blinktime);
 	}
@@ -218,4 +230,57 @@ void rgb_effect(void){
 		wait_ms(50);
 		
 	}
+}
+
+void update_sft_reg(void){
+	cli(); // Disable interrupts
+	for (uint8_t i = 0; i < 8 ; i++) // LSB first
+	{
+		if (SHIFT_REG & 1<<i)
+		{
+			PORTB.OUTSET = sft_DATA; // send 1
+		}
+		else {
+			PORTB.OUTCLR = sft_DATA; // send 0
+		}
+		
+	}
+	
+	PORTB.OUTSET = sft_CLK; //tick clock
+	PORTB.OUTCLR = sft_CLK;
+	sei(); // Enable interrupts
+}
+
+void rear_blinker(uint8_t side, bool enable){
+	if (side == Left)
+	{
+		if (enable)
+		{
+			SHIFT_REG |= 0b00100000;
+		}
+		else {
+			SHIFT_REG &= ~(0b00100000);
+		}
+	}
+	if (side == Right)
+	{
+		if (enable)
+		{
+			SHIFT_REG |= 0b00010000;
+		}
+		else {
+			SHIFT_REG &= ~(0b00010000);
+		}
+	}
+}
+
+void horn(bool enable){
+	if (enable)
+	{
+		SHIFT_REG |= 0b01000000;
+	}
+	else {
+		SHIFT_REG &= ~(0b01000000);
+	}
+	
 }

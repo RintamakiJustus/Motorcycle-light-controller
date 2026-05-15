@@ -40,6 +40,7 @@ float_t engine_temperature = 0;
 
 uint8_t buttonflag = 0; // Flag for any button input
 
+
 	
 void blink_code(uint8_t num);
 
@@ -135,14 +136,14 @@ void update_mode(){
 }
 
 void blink_code(uint8_t num){
-	PORTB.OUTCLR = PB2;
+	PORTB.OUTCLR = sft_DATA;
 	wait_ms(500);
 	set_ledbar(0);
 	for (uint8_t i = 0; i<num;i++ )
 	{
-		PORTB.OUTTGL = PB2;
+		PORTB.OUTTGL = sft_DATA;
 		wait_ms(500);
-		PORTB.OUTTGL = PB2;
+		PORTB.OUTTGL = sft_DATA;
 		wait_ms(500);
 		
 	}
@@ -168,10 +169,10 @@ int main(void)
 	
 	if (blinker_middle.longpress) {
 		limiter = 0;
-		PORTB.OUTCLR = PB2; // Main map on
+		PORTB.OUTCLR = sft_DATA; // Main map on
 	}
 	else {
-		PORTB.OUTSET = PB2;
+		PORTB.OUTSET = sft_DATA;
 	}
 	
     while(1)

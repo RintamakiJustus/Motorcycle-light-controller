@@ -15,6 +15,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <stdbool.h>
 #include "output_control.h"
 #include "Ws2812.h"
 
@@ -45,9 +46,9 @@
 
 //Auxillary outputs
 
-#define PB2 PIN2_bm // PORTB, +led
+#define sft_DATA PIN2_bm // PORTB, +led sft data
 #define thermistorpin PIN7_bm // PORTA, 100k Pull-up
-#define shiftregisterpin PIN3_bm // PORTB 
+#define sft_CLK PIN3_bm // PORTB 
 
 
 #endif /* CONFIG_H_ */

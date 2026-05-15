@@ -20,6 +20,7 @@ output_control.d output_control.o: .././output_control.c \
  c:\program\ files\microchip\xc8\v2.36\avr\avr\include\util\delay_basic.h \
  c:\program\ files\microchip\xc8\v2.36\avr\avr\include\math.h \
  c:\program\ files\microchip\xc8\v2.36\avr\avr\include\avr\interrupt.h \
+ c:\program\ files\microchip\xc8\v2.36\avr\lib\gcc\avr\5.4.0\include\stdbool.h \
  .././Ws2812.h
 
 .././output_control.h:
@@ -65,5 +66,7 @@ c:\program\ files\microchip\xc8\v2.36\avr\avr\include\util\delay_basic.h:
 c:\program\ files\microchip\xc8\v2.36\avr\avr\include\math.h:
 
 c:\program\ files\microchip\xc8\v2.36\avr\avr\include\avr\interrupt.h:
+
+c:\program\ files\microchip\xc8\v2.36\avr\lib\gcc\avr\5.4.0\include\stdbool.h:
 
 .././Ws2812.h:
